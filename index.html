@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c0d0f" />
+  <meta name="description" content="Sonora — an unhurried place for your music." />
+  <title>sonora — a place to listen</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+  <script>
+    // Set the saved appearance before CSS paints the page.
+    try {
+      const choice = localStorage.getItem('sonora-theme') || 'dark';
+      document.documentElement.dataset.theme = choice === 'light' || (choice === 'system' && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    } catch (_) { document.documentElement.dataset.theme = 'dark'; }
+  </script>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" aria-label="Main navigation">
+      <div class="topbar-left">
+        <button class="brand" id="brand-button" aria-label="Sonora home" title="Sonora home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 36 36" width="34" height="34" fill="none"><rect x="1" y="1" width="34" height="34" rx="10" fill="#E8DDC9"/><path d="M9 21v-6m4.5 11V10m4.5 12V14m4.5 12V10M27 21v-6" stroke="#292724" stroke-width="2.4" stroke-linecap="round"/></svg>
+          </span>
+          <span class="brand-word">sonora</span>
+        </button>
+        <div class="history-controls" aria-label="Navigation history">
+          <button class="icon-button history-button" id="nav-back" aria-label="Go back" title="Go back" disabled><span data-icon="chevron-left"></span></button>
+          <button class="icon-button history-button" id="nav-forward" aria-label="Go forward" title="Go forward" disabled><span data-icon="chevron-right"></span></button>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <button class="home-button" id="home-button" aria-label="Home" title="Home"><span data-icon="home"></span></button>
+        <div class="search-container" id="search-container">
+          <div class="global-search-box">
+            <span class="search-leading" data-icon="search" aria-hidden="true"></span>
+            <input id="global-search" type="search" autocomplete="off" spellcheck="false" placeholder="Find something to listen to" aria-label="Search music and playlists" aria-controls="search-results" />
+            <span class="search-divider"></span>
+            <button class="search-browse" id="browse-button" aria-label="Browse your library" title="Browse your library"><span data-icon="browse"></span></button>
+          </div>
+          <div class="search-results" id="search-results" hidden></div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="premium-button" id="premium-button">Explore <span data-icon="arrow-up-right"></span></button>
+        <button class="install-button" id="install-button"><span data-icon="plus"></span><span>Add files</span></button>
+        <div class="theme-control" id="theme-control">
+          <button class="theme-button" id="theme-button" type="button" aria-label="Change theme" aria-expanded="false" aria-controls="theme-menu" title="Change theme"><span data-icon="moon"></span><span class="theme-button-label">Theme</span></button>
+          <div class="theme-menu" id="theme-menu" role="group" aria-label="Choose appearance" hidden>
+            <span class="theme-menu-heading">APPEARANCE</span>
+            <button class="theme-option" type="button" data-theme-choice="dark" aria-pressed="true"><span data-icon="moon"></span><span>Dark</span><span class="theme-option-check" data-icon="check"></span></button>
+            <button class="theme-option" type="button" data-theme-choice="light" aria-pressed="false"><span data-icon="sun"></span><span>Light</span><span class="theme-option-check" data-icon="check"></span></button>
+            <button class="theme-option" type="button" data-theme-choice="system" aria-pressed="false"><span data-icon="monitor"></span><span>System</span><span class="theme-option-check" data-icon="check"></span></button>
+          </div>
+        </div>
+        <button class="icon-button notifications-button" id="notifications-button" aria-label="Notifications" title="Notifications"><span data-icon="bell"></span></button>
+        <button class="avatar-button" id="avatar-button" aria-label="Account menu" title="Account menu">S</button>
+      </div>
+    </header>
+
+    <main class="workspace show-right" id="workspace">
+      <aside class="library-panel panel" aria-label="Your library">
+        <div class="library-fixed">
+          <div class="library-heading-row">
+            <button class="library-title" id="library-title" title="Your collection"><span data-icon="collection"></span><span>Collection</span></button>
+            <div class="library-heading-actions">
+              <button class="icon-button" id="library-add" aria-label="Import music to your library" title="Import music"><span data-icon="plus"></span></button>
+              <button class="icon-button" id="library-collapse" aria-label="Collapse library" title="Collapse library"><span data-icon="arrow-right"></span></button>
+            </div>
+          </div>
+          <div class="library-filters" role="group" aria-label="Filter your library">
+            <button class="filter-chip" data-filter="Playlists">Playlists</button>
+            <button class="filter-chip" data-filter="Artists">Artists</button>
+            <button class="filter-chip" data-filter="Albums">Albums</button>
+          </div>
+        </div>
+        <div class="library-scroll custom-scroll" id="library-scroll">
+          <div class="promo-card" id="promo-card">
+            <div class="promo-content">
+              <div class="promo-kicker">LOCAL MUSIC <span class="promo-kicker-line" aria-hidden="true"></span></div>
+              <h2>Make room for<br />your music.</h2>
+              <p>Add audio files from your device.</p>
+              <button class="promo-button" id="import-button">Add audio <span data-icon="arrow-up-right"></span></button>
+            </div>
+          </div>
+          <div class="library-toolbar">
+            <div class="library-search-group" id="library-search-group">
+              <button class="icon-button library-search-button" id="library-search-toggle" aria-label="Search in your library" title="Search in your library"><span data-icon="search"></span></button>
+              <input id="library-search-input" type="search" placeholder="Search in Your Library" aria-label="Search in your library" autocomplete="off" />
+            </div>
+            <button class="library-sort" id="library-sort" title="Change library sort order"><span id="library-sort-label">Recents</span><span data-icon="list"></span></button>
+          </div>
+          <div class="library-list" id="library-list" role="list" aria-label="Your saved music"></div>
+        </div>
+      </aside>
+
+      <section class="center-panel panel custom-scroll" id="center-panel" aria-label="Playlist details">
+        <div class="playlist-hero" id="playlist-hero"></div>
+        <div class="playlist-body" id="playlist-body">
+          <div class="playlist-actions">
+            <div class="playlist-actions-left">
+              <button class="hero-play-button" id="hero-play" aria-label="Play playlist" title="Play playlist"><span data-icon="play-fill"></span></button>
+              <button class="action-icon" id="save-playlist" aria-label="Save playlist to library" title="Save playlist to library"><span data-icon="plus-circle"></span></button>
+              <button class="action-icon" id="download-playlist" aria-label="Export tracklist" title="Export tracklist"><span data-icon="download"></span></button>
+              <div class="menu-anchor">
+                <button class="action-icon" id="playlist-more" aria-label="More playlist options" title="More playlist options" aria-expanded="false"><span data-icon="more"></span></button>
+                <div class="popover-menu" id="playlist-menu" hidden>
+                  <button data-menu-action="shuffle"><span data-icon="shuffle"></span> Shuffle play</button>
+                  <button data-menu-action="copy"><span data-icon="link"></span> Copy playlist link</button>
+                  <button data-menu-action="export"><span data-icon="download"></span> Export tracklist</button>
+                </div>
+              </div>
+            </div>
+            <div class="playlist-actions-right">
+              <button class="playlist-search-toggle" id="playlist-search-toggle" aria-label="Search in playlist" title="Search in playlist"><span data-icon="search"></span></button>
+              <input class="playlist-search-input" id="playlist-search-input" type="search" placeholder="Find in playlist" autocomplete="off" aria-label="Find in playlist" />
+              <button class="view-toggle" id="view-toggle" title="Toggle compact view"><span id="view-toggle-label">List</span><span data-icon="list"></span></button>
+            </div>
+          </div>
+          <div class="tracks-wrap" id="tracks-wrap">
+            <div class="track-header track-grid" id="track-header" aria-hidden="true">
+              <div class="track-number-header">#</div>
+              <div>Title</div>
+              <div class="column-album">Album</div>
+              <div class="column-added">Date added</div>
+              <div class="duration-heading"><span data-icon="clock"></span></div>
+            </div>
+            <div class="track-list" id="track-list" role="list" aria-label="Tracks"></div>
+            <div class="track-list-footer" id="track-list-footer">End of playlist</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="now-panel panel custom-scroll" id="now-panel" aria-label="Now playing">
+        <div class="now-heading-row">
+          <div class="now-heading"><span class="now-heading-pulse"></span>Playing now</div>
+          <div class="now-heading-actions">
+            <button class="icon-button" id="now-more" aria-label="Track options" title="Track options"><span data-icon="more"></span></button>
+            <button class="icon-button" id="close-now" aria-label="Close now playing panel" title="Close now playing"><span data-icon="close"></span></button>
+          </div>
+        </div>
+        <div class="now-content" id="now-content"></div>
+      </aside>
+    </main>
+
+    <footer class="player" aria-label="Music player">
+      <div class="footer-track" id="footer-track"></div>
+      <div class="footer-middle">
+        <div class="transport-controls" role="group" aria-label="Playback controls">
+          <button class="transport-button" id="shuffle-button" aria-label="Shuffle off" title="Shuffle"><span data-icon="shuffle"></span></button>
+          <button class="transport-button" id="previous-button" aria-label="Previous track" title="Previous"><span data-icon="previous"></span></button>
+          <button class="transport-play" id="play-button" aria-label="Play" title="Play"><span data-icon="play-fill"></span></button>
+          <button class="transport-button" id="next-button" aria-label="Next track" title="Next"><span data-icon="next"></span></button>
+          <button class="transport-button" id="repeat-button" aria-label="Repeat off" title="Repeat"><span data-icon="repeat"></span><span class="control-active-dot"></span></button>
+        </div>
+        <div class="progress-controls">
+          <span class="time-text" id="elapsed-time">0:00</span>
+          <input type="range" class="range-slider progress-slider" id="progress-slider" min="0" max="100" value="0" step="0.1" aria-label="Playback position" style="--fill:0%" />
+          <span class="time-text" id="total-time">3:38</span>
+        </div>
+      </div>
+      <div class="footer-right" role="group" aria-label="Playback options">
+        <button class="footer-tool active" id="toggle-now" aria-label="Hide now playing" title="Now playing"><span data-icon="now-playing"></span><span class="control-active-dot"></span></button>
+        <button class="footer-tool" id="queue-button" aria-label="Show queue" title="Queue"><span data-icon="queue"></span></button>
+        <button class="footer-tool" id="device-button" aria-label="Connect to a device" title="Connect to a device"><span data-icon="devices"></span></button>
+        <button class="footer-tool" id="mute-button" aria-label="Mute" title="Mute"><span data-icon="volume"></span></button>
+        <input type="range" class="range-slider volume-slider" id="volume-slider" min="0" max="100" value="70" aria-label="Volume" style="--fill:70%" />
+        <button class="footer-tool expand-button" id="fullscreen-button" aria-label="Full screen" title="Full screen"><span data-icon="expand"></span></button>
+      </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="queue-overlay" id="queue-overlay" hidden>
+      <div class="queue-panel">
+        <div class="queue-panel-heading"><div><span class="queue-eyebrow">COMING UP</span><h2>Play queue</h2></div><button class="icon-button" id="close-queue" aria-label="Close queue"><span data-icon="close"></span></button></div>
+        <div id="queue-content"></div>
+      </div>
+    </div>
+    <input type="file" id="file-input" accept="audio/*" multiple hidden />
+    <audio id="audio-element" preload="none" loop></audio>
+  </div>
+</body>
+</html>
